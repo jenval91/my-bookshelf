@@ -366,6 +366,33 @@
   .bkbtn svg{width:17px; height:17px;}
   .bkbtn:active{transform:scale(.96);}
   .bkbtn.wide{grid-column:1 / -1;}
+
+  /* mood + weather */
+  .mood-row{display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-top:14px;}
+  .mood-lbl{font-size:11px; color:var(--ink-soft); font-weight:800; text-transform:uppercase; letter-spacing:.04em; margin-right:3px;}
+  .banner.hasimg .mood-lbl{color:#ffe9d6;}
+  .moodchip{width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line); background:var(--card);
+    font-size:15px; cursor:pointer; display:grid; place-items:center; transition:.15s; padding:0; line-height:1;}
+  .moodchip.on{background:var(--coral); border-color:var(--coral); box-shadow:0 6px 14px -7px var(--coral); transform:scale(1.1);}
+  .banner.hasimg .moodchip{background:rgba(255,255,255,.82); border-color:rgba(255,255,255,.4);}
+  .banner.hasimg .moodchip.on{background:var(--coral); border-color:var(--coral);}
+  .wx-badge{margin-left:auto; font-size:12px; font-weight:800; color:var(--ink-soft); background:var(--card);
+    border:1.5px solid var(--line); border-radius:14px; padding:5px 11px; white-space:nowrap;}
+  .banner.hasimg .wx-badge{background:rgba(255,255,255,.82); color:var(--ink);}
+
+  /* yearly goal meter */
+  .goal-card{border-radius:var(--r); padding:18px; margin-top:14px; box-shadow:var(--shadow); border:1.5px solid var(--line2);
+    background:linear-gradient(135deg,#fff1de,#ffe0c6); position:relative; overflow:hidden;}
+  .goal-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; position:relative; z-index:1;}
+  .goal-h{font-family:'Fraunces',serif; font-weight:600; font-size:18px;}
+  .goal-count{font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--coral-dk); white-space:nowrap;}
+  .goal-sub{font-size:13px; color:var(--ink-soft); font-weight:700; margin-top:3px; position:relative; z-index:1;}
+  .goal-bar{height:12px; background:#f3e3d0; border-radius:8px; overflow:hidden; margin-top:13px; position:relative; z-index:1;}
+  .goal-bar>i{display:block; height:100%; border-radius:8px; background:linear-gradient(90deg,var(--honey),var(--coral)); transition:width .5s;}
+  .goal-empty{border-radius:var(--r); padding:16px 18px; margin-top:14px; box-shadow:var(--shadow-sm); border:1.5px solid var(--line);
+    background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .goal-empty span{font-size:13.5px; color:var(--ink-soft); font-weight:700;}
+  .goal-empty button{background:var(--coral); color:#fff; border:none; border-radius:12px; padding:9px 15px; font-size:13px; font-weight:800; font-family:inherit; cursor:pointer;}
 </style>
 </head>
 <body>
@@ -400,6 +427,11 @@
       <span class="al">Arrange by</span>
       <span class="seg" id="groupSeg"><button data-g="series" class="on">Collection</button><button data-g="author">Author</button><button data-g="status">Status</button></span>
     </div>
+    <div class="arrange">
+      <span class="al">Sort</span>
+      <span class="seg" id="sortSeg"><button data-s="default" class="on">Default</button><button data-s="title">Title</button><button data-s="rating">Rating</button><button data-s="recent">Recently added</button></span>
+      <span class="chip" id="ownedOnlyChip" style="margin-left:auto;">Owned only</span>
+    </div>
     <div id="shelves"></div>
   </section>
 
@@ -413,6 +445,7 @@
   <section class="view" id="v-stats">
     <div class="sec">Your finishing ribbon</div><div class="sec-sub">A cozy record of what you've wrapped up. No daily pressure — every finish counts.</div>
     <div id="streakSlot"></div>
+    <div id="goalSlot"></div>
     <div class="sec">Your reading life</div><div class="sec-sub">Every finished book counts. Look how far you've come.</div>
     <div class="stat-grid" id="statGrid"></div>
     <div class="ring-wrap"><div id="ringHolder"></div><div class="ring-txt"><div class="pct" id="ringPct"></div><div class="desc" id="ringDesc"></div></div></div>
@@ -445,6 +478,7 @@
 const SEED = [{"id":0,"title":"Empire of Silence","author":"Christopher Ruocchio","series":"Sun Eater","order":1,"format":"paperback","status":"read","owned":false,"isbn":"9780756413019","progress":100,"color":"#a07a5a"},{"id":1,"title":"A Game of Thrones","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":1,"format":"paperback","status":"to-read","owned":true,"isbn":"9780553588484","progress":0,"color":"#739e8b"},{"id":2,"title":"Half a War","author":"Joe Abercrombie","series":"Shattered Sea","order":3,"format":"paperback","status":"to-read","owned":false,"isbn":"9780007550289","progress":0,"color":"#8d7bb0"},{"id":3,"title":"The Poppy War","author":"R.F. Kuang","series":"The Poppy War","order":1,"format":"digital","status":"read","owned":true,"isbn":"9780062662590","progress":100,"color":"#5fa39a"},{"id":4,"title":"The Fury of the Gods","author":"John Gwynne","series":"The Bloodsworn Saga","order":3,"format":"hardcover","status":"paused","owned":true,"isbn":"9780356514260","progress":0,"color":"#6f93b0"},{"id":5,"title":"The Assassin's Blade","author":"Sarah J. Maas","series":"Throne of Glass","order":1,"format":"digital","status":"to-read","owned":true,"isbn":"9781408852590","progress":0,"color":"#6d8fa6"},{"id":6,"title":"Queen of Shadows","author":"Sarah J. Maas","series":"Throne of Glass","order":5,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781619636040","progress":0,"color":"#6d8fa6"},{"id":7,"title":"Throne of Glass","author":"Sarah J. Maas","series":"Throne of Glass","order":2,"format":"paperback","status":"to-read","owned":true,"isbn":"9781619630345","progress":0,"color":"#6d8fa6"},{"id":8,"title":"The Priory of the Orange Tree","author":"Samantha Shannon","series":"Roots of Chaos","order":1,"format":"hardcover","status":"read","owned":false,"isbn":"9781635570298","progress":100,"color":"#9a6b86"},{"id":9,"title":"Malice","author":"John Gwynne","series":"The Faithful and the Fallen","order":1,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780230758452","progress":0,"color":"#6f93b0"},{"id":10,"title":"The Strength of the Few","author":"James Islington","series":"Hierarchy","order":2,"format":"digital","status":"read","owned":false,"isbn":"9781982141257","progress":100,"color":"#739e8b"},{"id":11,"title":"Crown of Midnight","author":"Sarah J. Maas","series":"Throne of Glass","order":3,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781619630628","progress":0,"color":"#6d8fa6"},{"id":12,"title":"The Lesser Devil","author":"Christopher Ruocchio","series":"Sun Eater: Novellas","order":1,"format":"digital","status":"to-read","owned":false,"isbn":"B0852RDGDH","progress":0,"color":"#a07a5a"},{"id":13,"title":"Golden Son","author":"Pierce Brown","series":"Red Rising Saga","order":2,"format":"paperback","status":"read","owned":false,"isbn":"","progress":100,"color":"#cf7e5a"},{"id":14,"title":"Red Rising","author":"Pierce Brown","series":"Red Rising Saga","order":1,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780345539786","progress":0,"color":"#cf7e5a"},{"id":15,"title":"Babel","author":"R.F. Kuang","series":"Kuang: Standalones","order":1,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780063021426","progress":0,"color":"#5fa39a"},{"id":16,"title":"Shadows Upon Time","author":"Christopher Ruocchio","series":"Sun Eater","order":7,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780756420000","progress":0,"color":"#a07a5a"},{"id":17,"title":"A Court of Wings and Ruin","author":"Sarah J. Maas","series":"A Court of Thorns and Roses","order":3,"format":"paperback","status":"read","owned":false,"isbn":"9781408857908","progress":100,"color":"#6d8fa6"},{"id":18,"title":"Yellowface","author":"R.F. Kuang","series":"Kuang: Standalones","order":2,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780008532772","progress":0,"color":"#5fa39a"},{"id":19,"title":"Wrath","author":"John Gwynne","series":"The Faithful and the Fallen","order":4,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781447259688","progress":0,"color":"#6f93b0"},{"id":20,"title":"The Burning God","author":"R.F. Kuang","series":"The Poppy War","order":3,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780008339142","progress":0,"color":"#5fa39a"},{"id":21,"title":"The Heroes","author":"Joe Abercrombie","series":"First Law: Standalones","order":2,"format":"digital","status":"to-read","owned":false,"isbn":"9780316123358","progress":0,"color":"#8d7bb0"},{"id":22,"title":"A Feast for Crows","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":5,"format":"paperback","status":"to-read","owned":true,"isbn":"055358202X","progress":0,"color":"#739e8b"},{"id":23,"title":"A Time of Blood","author":"John Gwynne","series":"Of Blood and Bone","order":2,"format":"hardcover","status":"to-read","owned":false,"isbn":"9781509812981","progress":0,"color":"#6f93b0"},{"id":24,"title":"The Wisdom of Crowds","author":"Joe Abercrombie","series":"The Age of Madness","order":3,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780575095977","progress":0,"color":"#8d7bb0"},{"id":25,"title":"Sharp Ends","author":"Joe Abercrombie","series":"First Law: Standalones","order":4,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780316390811","progress":0,"color":"#8d7bb0"},{"id":26,"title":"Red Country","author":"Joe Abercrombie","series":"First Law: Standalones","order":3,"format":"digital","status":"to-read","owned":false,"isbn":"9780316214445","progress":0,"color":"#8d7bb0"},{"id":27,"title":"A Time of Courage","author":"John Gwynne","series":"Of Blood and Bone","order":3,"format":"hardcover","status":"to-read","owned":false,"isbn":"9781509813025","progress":0,"color":"#6f93b0"},{"id":28,"title":"A Knight of the Seven Kingdoms","author":"George R.R. Martin","series":"Westeros: Companion","order":2,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780345533487","progress":0,"color":"#739e8b"},{"id":29,"title":"Morning Star","author":"Pierce Brown","series":"Red Rising Saga","order":3,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780345539847","progress":0,"color":"#cf7e5a"},{"id":30,"title":"A Court of Mist and Fury","author":"Sarah J. Maas","series":"A Court of Thorns and Roses","order":2,"format":"paperback","status":"read","owned":false,"isbn":"9781635575583","progress":100,"color":"#6d8fa6"},{"id":31,"title":"Kingdoms of Death","author":"Christopher Ruocchio","series":"Sun Eater","order":4,"format":"paperback","status":"to-read","owned":false,"isbn":"9781473218352","progress":0,"color":"#a07a5a"},{"id":32,"title":"A Clash of Kings","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":2,"format":"paperback","status":"to-read","owned":true,"isbn":"9780553381696","progress":0,"color":"#739e8b"},{"id":33,"title":"One Dark Window","author":"Rachel Gillig","series":"The Shepherd King","order":1,"format":"paperback","status":"read","owned":false,"isbn":"9780316312486","progress":100,"color":"#7f9e74"},{"id":34,"title":"The Blade Itself","author":"Joe Abercrombie","series":"The First Law","order":1,"format":"paperback","status":"to-read","owned":false,"isbn":"9780575079793","progress":0,"color":"#8d7bb0"},{"id":35,"title":"The Shadow of the Gods","author":"John Gwynne","series":"The Bloodsworn Saga","order":1,"format":"hardcover","status":"read","owned":true,"isbn":"9780356514185","progress":100,"color":"#6f93b0"},{"id":36,"title":"The Winds of Winter","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":7,"format":"hardcover","status":"to-read","owned":false,"isbn":"","progress":0,"color":"#739e8b"},{"id":37,"title":"Last Argument of Kings","author":"Joe Abercrombie","series":"The First Law","order":2,"format":"paperback","status":"to-read","owned":false,"isbn":"9780575077904","progress":0,"color":"#8d7bb0"},{"id":38,"title":"Fire & Blood","author":"George R.R. Martin","series":"Westeros: Companion","order":1,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781524796280","progress":0,"color":"#739e8b"},{"id":39,"title":"Kingdom of Ash","author":"Sarah J. Maas","series":"Throne of Glass","order":8,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781619636101","progress":0,"color":"#6d8fa6"},{"id":40,"title":"Quicksilver","author":"Callie Hart","series":"Standalones","order":1,"format":"digital","status":"to-read","owned":true,"isbn":"B0D349TCTS","progress":0,"color":"#c2674f"},{"id":41,"title":"The Devils","author":"Joe Abercrombie","series":"First Law: Standalones","order":5,"format":"hardcover","status":"currently-reading","owned":false,"isbn":"9781250880055","progress":35,"color":"#8d7bb0"},{"id":42,"title":"Disquiet Gods","author":"Christopher Ruocchio","series":"Sun Eater","order":6,"format":"hardcover","status":"to-read","owned":false,"isbn":"9781982193324","progress":0,"color":"#a07a5a"},{"id":43,"title":"The Well of Ascension","author":"Brandon Sanderson","series":"Mistborn: Era One","order":2,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780765316882","progress":0,"color":"#b3708f"},{"id":44,"title":"A Storm of Swords: Blood and Gold","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":4,"format":"paperback","status":"to-read","owned":false,"isbn":"9780007119554","progress":0,"color":"#739e8b"},{"id":45,"title":"Valor","author":"John Gwynne","series":"The Faithful and the Fallen","order":2,"format":"paperback","status":"to-read","owned":true,"isbn":"9780316399746","progress":0,"color":"#6f93b0"},{"id":46,"title":"The Raven Scholar","author":"Antonia Hodgson","series":"Standalones","order":1,"format":"digital","status":"read","owned":false,"isbn":"9781529339888","progress":100,"color":"#a07a5a"},{"id":47,"title":"A Dream of Spring","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":8,"format":"paperback","status":"to-read","owned":false,"isbn":"","progress":0,"color":"#739e8b"},{"id":48,"title":"Two Twisted Crowns","author":"Rachel Gillig","series":"The Shepherd King","order":2,"format":"paperback","status":"read","owned":false,"isbn":"9780356519500","progress":100,"color":"#7f9e74"},{"id":49,"title":"A Court of Thorns and Roses","author":"Sarah J. Maas","series":"A Court of Thorns and Roses","order":1,"format":"hardcover","status":"read","owned":false,"isbn":"9781619634442","progress":100,"color":"#6d8fa6"},{"id":50,"title":"The First Law Trilogy (Box Set)","author":"Joe Abercrombie","series":"The First Law","order":1,"format":"unknown","status":"to-read","owned":false,"isbn":"","progress":0,"color":"#8d7bb0"},{"id":51,"title":"The Wolves of War","author":"John Gwynne","series":"Banished Lands: Companion","order":1,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780356527871","progress":0,"color":"#6f93b0"},{"id":52,"title":"Dark Age","author":"Pierce Brown","series":"Red Rising Saga","order":5,"format":"digital","status":"to-read","owned":false,"isbn":"9780425285954","progress":0,"color":"#cf7e5a"},{"id":53,"title":"Empire of Storms","author":"Sarah J. Maas","series":"Throne of Glass","order":6,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781619636071","progress":0,"color":"#6d8fa6"},{"id":54,"title":"A Storm of Swords","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":3,"format":"paperback","status":"to-read","owned":true,"isbn":"055357342X","progress":0,"color":"#739e8b"},{"id":55,"title":"The Final Empire","author":"Brandon Sanderson","series":"Mistborn: Era One","order":1,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780765311788","progress":0,"color":"#b3708f"},{"id":56,"title":"An Echo of Things to Come","author":"James Islington","series":"Licanius Trilogy","order":2,"format":"hardcover","status":"read","owned":false,"isbn":"9780316274111","progress":100,"color":"#739e8b"},{"id":57,"title":"The Knight and the Moth","author":"Rachel Gillig","series":"The Stonewater Saga","order":1,"format":"hardcover","status":"currently-reading","owned":false,"isbn":"9780316582704","progress":35,"color":"#7f9e74"},{"id":58,"title":"The Hunger of the Gods","author":"John Gwynne","series":"The Bloodsworn Saga","order":2,"format":"hardcover","status":"read","owned":true,"isbn":"9780356514222","progress":100,"color":"#6f93b0"},{"id":59,"title":"Ruin","author":"John Gwynne","series":"The Faithful and the Fallen","order":3,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781447259626","progress":0,"color":"#6f93b0"},{"id":60,"title":"Blood Over Bright Haven","author":"M.L. Wang","series":"M.L. Wang: Standalones","order":1,"format":"digital","status":"read","owned":true,"isbn":"B0B5KLVCHZ","progress":100,"color":"#a8894e"},{"id":61,"title":"Project Hail Mary","author":"Andy Weir","series":"Standalones","order":1,"format":"hardcover","status":"read","owned":true,"isbn":"9780593135204","progress":100,"color":"#d96b52"},{"id":62,"title":"Alchemised","author":"SenLinYu","series":"Standalones","order":1,"format":"digital","status":"to-read","owned":false,"isbn":"B0DQ72PKP2","progress":0,"color":"#739e8b"},{"id":63,"title":"A Time of Dread","author":"John Gwynne","series":"Of Blood and Bone","order":1,"format":"hardcover","status":"to-read","owned":false,"isbn":"9781509812943","progress":0,"color":"#6f93b0"},{"id":64,"title":"Tower of Dawn","author":"Sarah J. Maas","series":"Throne of Glass","order":7,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781681195773","progress":0,"color":"#6d8fa6"},{"id":65,"title":"Half the World","author":"Joe Abercrombie","series":"Shattered Sea","order":2,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780804178426","progress":0,"color":"#8d7bb0"},{"id":66,"title":"The Will of the Many","author":"James Islington","series":"Hierarchy","order":1,"format":"hardcover","status":"read","owned":true,"isbn":"9781982141172","progress":100,"color":"#739e8b"},{"id":67,"title":"The Dragon Republic","author":"R.F. Kuang","series":"The Poppy War","order":2,"format":"digital","status":"read","owned":true,"isbn":"9780062662613","progress":100,"color":"#5fa39a"},{"id":68,"title":"Light Bringer","author":"Pierce Brown","series":"Red Rising Saga","order":6,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780425285978","progress":0,"color":"#cf7e5a"},{"id":69,"title":"The Shadow of What Was Lost","author":"James Islington","series":"Licanius Trilogy","order":1,"format":"paperback","status":"read","owned":false,"isbn":"9780992580209","progress":100,"color":"#739e8b"},{"id":70,"title":"Half a King","author":"Joe Abercrombie","series":"Shattered Sea","order":1,"format":"paperback","status":"to-read","owned":false,"isbn":"9780007550227","progress":0,"color":"#8d7bb0"},{"id":71,"title":"Heir of Fire","author":"Sarah J. Maas","series":"Throne of Glass","order":4,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781619630659","progress":0,"color":"#6d8fa6"},{"id":72,"title":"Iron Flame","author":"Rebecca Yarros","series":"The Empyrean","order":2,"format":"hardcover","status":"read","owned":true,"isbn":"9781649374172","progress":100,"color":"#5fa39a"},{"id":73,"title":"Fourth Wing","author":"Rebecca Yarros","series":"The Empyrean","order":1,"format":"hardcover","status":"read","owned":true,"isbn":"9781649374042","progress":100,"color":"#5fa39a"},{"id":74,"title":"Best Served Cold","author":"Joe Abercrombie","series":"First Law: Standalones","order":1,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780575082458","progress":0,"color":"#8d7bb0"},{"id":75,"title":"The Light of All That Falls","author":"James Islington","series":"Licanius Trilogy","order":3,"format":"digital","status":"to-read","owned":false,"isbn":"","progress":0,"color":"#739e8b"},{"id":76,"title":"Licanius Trilogy (Box Set)","author":"James Islington","series":"Licanius Trilogy","order":1,"format":"paperback","status":"read","owned":false,"isbn":"9789123458325","progress":100,"color":"#739e8b"},{"id":77,"title":"The City of Brass","author":"Shannon Chakraborty","series":"The Daevabad Trilogy","order":1,"format":"paperback","status":"to-read","owned":false,"isbn":"139780062678102","progress":0,"color":"#e0913f"},{"id":78,"title":"A Court of Silver Flames","author":"Sarah J. Maas","series":"A Court of Thorns and Roses","order":5,"format":"hardcover","status":"read","owned":false,"isbn":"9781681196282","progress":100,"color":"#6d8fa6"},{"id":79,"title":"Iron Gold","author":"Pierce Brown","series":"Red Rising Saga","order":4,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780425285916","progress":0,"color":"#cf7e5a"},{"id":80,"title":"Demon in White","author":"Christopher Ruocchio","series":"Sun Eater","order":3,"format":"hardcover","status":"to-read","owned":false,"isbn":"9781473218321","progress":0,"color":"#a07a5a"},{"id":81,"title":"The Trouble with Peace","author":"Joe Abercrombie","series":"The Age of Madness","order":2,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780575095915","progress":0,"color":"#8d7bb0"},{"id":82,"title":"Ashes of Man","author":"Christopher Ruocchio","series":"Sun Eater","order":5,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780756416607","progress":0,"color":"#a07a5a"},{"id":83,"title":"A Court of Frost and Starlight","author":"Sarah J. Maas","series":"A Court of Thorns and Roses","order":4,"format":"paperback","status":"read","owned":false,"isbn":"9781635575620","progress":100,"color":"#6d8fa6"},{"id":84,"title":"A Dance with Dragons","author":"George R.R. Martin","series":"A Song of Ice and Fire","order":6,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780553801477","progress":0,"color":"#739e8b"},{"id":85,"title":"A Little Hatred","author":"Joe Abercrombie","series":"The Age of Madness","order":1,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780316187169","progress":0,"color":"#8d7bb0"},{"id":86,"title":"Red God","author":"Pierce Brown","series":"Red Rising Saga","order":7,"format":"digital","status":"to-read","owned":false,"isbn":"","progress":0,"color":"#cf7e5a"},{"id":87,"title":"Katabasis","author":"R.F. Kuang","series":"Kuang: Standalones","order":3,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780063021471","progress":0,"color":"#5fa39a"},{"id":88,"title":"The Hero of Ages","author":"Brandon Sanderson","series":"Mistborn: Era One","order":3,"format":"hardcover","status":"to-read","owned":true,"isbn":"9780765316899","progress":0,"color":"#b3708f"},{"id":89,"title":"Howling Dark","author":"Christopher Ruocchio","series":"Sun Eater","order":2,"format":"hardcover","status":"to-read","owned":false,"isbn":"9780756413033","progress":0,"color":"#a07a5a"},{"id":90,"title":"The Sword of Kaigen","author":"M.L. Wang","series":"M.L. Wang: Standalones","order":1,"format":"digital","status":"read","owned":true,"isbn":"B07MNWKF2M","progress":100,"color":"#a8894e"},{"id":91,"title":"Onyx Storm","author":"Rebecca Yarros","series":"The Empyrean","order":3,"format":"hardcover","status":"to-read","owned":true,"isbn":"9781649377159","progress":0,"color":"#5fa39a"}];
 const BOOKS_KEY='my-bookshelf:books:v3';
 const PROFILE_KEY='my-bookshelf:profile:v1';
+const WEATHER_KEY='my-bookshelf:weather:v1';
 
 const store=(()=>{
   const hasWS=(typeof window!=='undefined'&&window.storage&&typeof window.storage.get==='function');
@@ -456,15 +490,17 @@ const store=(()=>{
 })();
 
 const ACCENTS={coral:['#e07a55','#c9603c'], berry:['#c25b7a','#a23f5e'], teal:['#4f9a93','#2f7a72'], amber:['#e0973a','#c2781f']};
-const DEFAULT_PROFILE={name:'Jennifer', shelfLook:'covers', accent:'coral', banner:null,
+const DEFAULT_PROFILE={name:'Jennifer', shelfLook:'covers', accent:'coral', banner:null, yearlyGoal:0,
   quotes:[{text:'A reader lives a thousand lives before he dies.', who:'George R.R. Martin'}]};
 
-let books=[], profile={...DEFAULT_PROFILE}, filterStatus='all', groupBy='series', query='', activeId=null;
+let books=[], profile={...DEFAULT_PROFILE}, filterStatus='all', groupBy='series', sortBy='default', ownedOnly=false, query='', activeId=null;
 
 async function init(){
   const sb=await store.get(BOOKS_KEY); books = sb&&Array.isArray(sb)&&sb.length ? sb : structuredClone(SEED);
   const sp=await store.get(PROFILE_KEY); profile = sp ? {...DEFAULT_PROFILE,...sp} : {...DEFAULT_PROFILE};
+  const wx=await store.get(WEATHER_KEY); if(wx&&wx.cat){ currentWeatherCat=wx.cat; currentWeatherTemp=wx.temp; }
   applyAccent(profile.accent); greet(); renderAll();
+  fetchWeather();
 }
 function persist(){ store.set(BOOKS_KEY,books); }
 function persistProfile(){ store.set(PROFILE_KEY,profile); }
@@ -491,6 +527,7 @@ const APPS=[
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function fits(b){ if(filterStatus!=='all'&&b.status!==filterStatus)return false;
+  if(ownedOnly&&!b.owned)return false;
   if(query){const q=query.toLowerCase(); if(!(b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.series||'').toLowerCase().includes(q)))return false;} return true;}
 function isRealSeries(s){ return s&&s!=='Standalones'&&!/Box Set|Companion|Novellas|Standalone/i.test(s); }
 function coverUrl(b,size){ return b.isbn ? `https://covers.openlibrary.org/b/isbn/${b.isbn}-${size}.jpg?default=false` : ''; }
@@ -513,17 +550,140 @@ function subline(){
   document.getElementById('subhi').textContent=lines[Math.floor(Math.random()*lines.length)];
 }
 
+/* ---------- mood + weather quotes ---------- */
+const MOODS=[
+  {k:'cozy',e:'☕'},
+  {k:'happy',e:'\u{1F60A}'},
+  {k:'calm',e:'\u{1F343}'},
+  {k:'tired',e:'\u{1F634}'},
+  {k:'low',e:'\u{1F499}'},
+  {k:'adventurous',e:'✨'}
+];
+const WX_ICON={clear:'☀️',cloudy:'☁️',fog:'\u{1F32B}️',rain:'\u{1F327}️',snow:'❄️',storm:'⛈️',night:'\u{1F319}'};
+const WX_LABEL={clear:'Clear',cloudy:'Cloudy',fog:'Foggy',rain:'Rainy',snow:'Snowy',storm:'Stormy',night:'Night'};
+
+const QUOTES=[
+  {text:"Even a page counts today."},
+  {text:"Your shelf is proud of you, no matter the pace."},
+  {text:"One chapter is still a chapter."},
+  {text:"There's no rush — the story will wait for you."},
+  {text:"Reading is rest, not a race."},
+  {text:"However far you get today is exactly far enough."},
+
+  {text:"A blanket, a mug, and a few pages — that's a good afternoon.", mood:['cozy']},
+  {text:"Cozy days are made for turning pages slowly.", mood:['cozy']},
+  {text:"Let the world stay outside for a little while.", mood:['cozy']},
+
+  {text:"Good moods make great chapters — enjoy this one.", mood:['happy']},
+  {text:"Carry this feeling into your next chapter.", mood:['happy']},
+  {text:"A happy heart reads a little lighter.", mood:['happy']},
+
+  {text:"Quiet moments and good books were made for each other.", mood:['calm']},
+  {text:"Let your breathing slow down with the page.", mood:['calm']},
+  {text:"Peaceful now, peaceful in the story.", mood:['calm']},
+
+  {text:"A tired mind still deserves a gentle story.", mood:['tired']},
+  {text:"Even a few lines before sleep still count.", mood:['tired']},
+  {text:"Rest first — the book will still be here.", mood:['tired']},
+
+  {text:"Some days a book is just a soft place to land.", mood:['low']},
+  {text:"It's okay to read slowly when the day was heavy.", mood:['low']},
+  {text:"This chapter is a small kindness you're giving yourself.", mood:['low']},
+
+  {text:"Feeling bold? Let's chase the next plot twist.", mood:['adventurous']},
+  {text:"Today feels like a good day to start something new.", mood:['adventurous']},
+  {text:"Adventure is just a page turn away.", mood:['adventurous']},
+
+  {text:"Bright skies, bright pages — a lovely day to read outside.", weather:['clear']},
+  {text:"Good light for reading, good day for a story.", weather:['clear']},
+
+  {text:"Soft grey skies make a good backdrop for a good book.", weather:['cloudy']},
+  {text:"Cloudy days are quiet ones — perfect for reading.", weather:['cloudy']},
+
+  {text:"The world's a little blurry today — let a story bring it into focus.", weather:['fog']},
+  {text:"Foggy out there, but your book is clear as ever.", weather:['fog']},
+
+  {text:"Rain outside, a story inside — hard to beat.", weather:['rain']},
+  {text:"Let the rain set the pace today. Slow is good.", weather:['rain']},
+
+  {text:"Snow outside, a warm page inside.", weather:['snow']},
+  {text:"A snowy day was basically made for reading.", weather:['snow']},
+
+  {text:"Thunder outside, quiet adventure inside.", weather:['storm']},
+  {text:"Let the storm pass while you turn the page.", weather:['storm']},
+
+  {text:"The house is quiet — a good time for just one more page.", weather:['night']},
+  {text:"Night reading has its own kind of magic.", weather:['night']}
+];
+
+let currentWeatherCat=null, currentWeatherTemp=null;
+
+function weatherCodeToCategory(code,isDay){
+  if(isDay===0) return 'night';
+  if(code===0) return 'clear';
+  if([1,2,3].includes(code)) return 'cloudy';
+  if([45,48].includes(code)) return 'fog';
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return 'rain';
+  if([71,73,75,77,85,86].includes(code)) return 'snow';
+  if([95,96,99].includes(code)) return 'storm';
+  return 'cloudy';
+}
+
+function fetchWeather(){
+  if(!('geolocation' in navigator)) return;
+  try{
+    navigator.geolocation.getCurrentPosition(async (pos)=>{
+      try{
+        const {latitude,longitude}=pos.coords;
+        const res=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&temperature_unit=fahrenheit&timezone=auto`);
+        const data=await res.json();
+        const cw=data&&data.current_weather;
+        if(!cw)return;
+        currentWeatherCat=weatherCodeToCategory(cw.weathercode,cw.is_day);
+        currentWeatherTemp=Math.round(cw.temperature);
+        store.set(WEATHER_KEY,{cat:currentWeatherCat,temp:currentWeatherTemp,at:Date.now()});
+        renderBanner();
+      }catch(e){ /* offline or the weather service didn't respond — keep whatever we already had */ }
+    }, ()=>{ /* location permission denied or unavailable — quotes still work without weather */ }, {timeout:8000, maximumAge:1800000});
+  }catch(e){ /* geolocation unsupported */ }
+}
+
+function currentMoodKey(){
+  const t=profile.moodToday; const today=new Date().toISOString().slice(0,10);
+  return (t&&t.date===today)? t.mood : null;
+}
+function setMood(k){
+  const today=new Date().toISOString().slice(0,10);
+  profile.moodToday = (currentMoodKey()===k) ? null : {mood:k,date:today};
+  persistProfile(); renderBanner();
+}
+function pickQuote(){
+  const mood=currentMoodKey(), wx=currentWeatherCat;
+  const personal=(profile.quotes||[]);
+  const pool=[...QUOTES, ...personal];
+  let tier=[];
+  if(mood&&wx) tier=pool.filter(q=>(q.mood||[]).includes(mood)&&(q.weather||[]).includes(wx));
+  if(!tier.length&&mood) tier=pool.filter(q=>(q.mood||[]).includes(mood));
+  if(!tier.length&&wx) tier=pool.filter(q=>(q.weather||[]).includes(wx));
+  if(!tier.length) tier=pool;
+  if(!tier.length) return null;
+  return tier[Math.floor(Math.random()*tier.length)];
+}
+
 function renderBanner(){
   const slot=document.getElementById('bannerSlot');
-  const qs=profile.quotes||[]; const q = qs.length? qs[Math.floor(Math.random()*qs.length)] : null;
+  const q=pickQuote();
   const hasImg=!!profile.banner;
-  if(!hasImg && !q){ slot.innerHTML=''; return; }
+  const mood=currentMoodKey();
+  const moodRow=`<div class="mood-row"><span class="mood-lbl">Feeling</span>${MOODS.map(m=>`<button class="moodchip ${mood===m.k?'on':''}" data-k="${m.k}" title="${m.k}">${m.e}</button>`).join('')}${currentWeatherCat?`<span class="wx-badge">${WX_ICON[currentWeatherCat]} ${WX_LABEL[currentWeatherCat]}${currentWeatherTemp!=null?', '+currentWeatherTemp+'°':''}</span>`:''}</div>`;
   slot.innerHTML=`<div class="banner ${hasImg?'hasimg':'noimg'}">
     ${hasImg?`<img class="bg" src="${profile.banner}" alt=""><div class="veil"></div>`:''}
     <button class="edit" id="bannerEdit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
     ${q?`<div class="q"><div class="qt">&ldquo;${esc(q.text)}&rdquo;</div>${q.who?`<div class="qw">${esc(q.who)}</div>`:''}</div>`:`<div class="q"><div class="qt" style="opacity:.7">Add a photo or a favorite line to make this yours.</div></div>`}
+    ${moodRow}
   </div>`;
   slot.querySelector('#bannerEdit').onclick=openPersonalize;
+  slot.querySelectorAll('.moodchip').forEach(b=>b.onclick=()=>setMood(b.dataset.k));
 }
 
 function renderApps(){
@@ -592,6 +752,15 @@ function renderShelves(){
   else if(groupBy==='author'){ keys.sort((a,b)=>groups[b].length-groups[a].length||a.localeCompare(b));
     keys.forEach(k=>groups[k].sort((x,y)=>(x.series||'').localeCompare(y.series||'')||(x.order||0)-(y.order||0))); }
   else { const ord={'Reading now':0,'Paused':1,'Want to read':2,'Finished':3}; keys.sort((a,b)=>(ord[a]??9)-(ord[b]??9)); }
+
+  // sort override: re-sorts the books *within* each shelf/group, group order stays the same
+  if(sortBy!=='default'){
+    const cmp = sortBy==='title' ? (x,y)=>x.title.localeCompare(y.title)
+      : sortBy==='rating' ? (x,y)=>(y.rating||0)-(x.rating||0)||x.title.localeCompare(y.title)
+      : sortBy==='recent' ? (x,y)=>(y.id||0)-(x.id||0)
+      : null;
+    if(cmp) keys.forEach(k=>groups[k].sort(cmp));
+  }
 
   const look=profile.shelfLook||'covers';
   const render = look==='spines'? spineHTML : coverHTML;
@@ -684,8 +853,30 @@ function renderStreak(){
   attachCovers(slot);
 }
 
+function renderGoal(){
+  const slot=document.getElementById('goalSlot'); if(!slot)return;
+  const goal=+profile.yearlyGoal||0;
+  const year=new Date().getFullYear();
+  if(!goal){
+    slot.innerHTML=`<div class="goal-empty"><span>Set a reading goal for ${year} to see your progress here.</span><button id="goalSetBtn">Set a goal</button></div>`;
+    document.getElementById('goalSetBtn').onclick=openPersonalize;
+    return;
+  }
+  const done=books.filter(b=>b.finishedDate&&b.finishedDate.slice(0,4)===String(year)).length;
+  const pct=Math.min(100,Math.round(done/goal*100));
+  let sub;
+  if(done>=goal) sub=`Goal met — amazing work this year! \u{1F389}`;
+  else { const left=goal-done; sub=`${left} more book${left===1?'':'s'} to reach your ${year} goal.`; }
+  slot.innerHTML=`<div class="goal-card">
+    <div class="goal-top"><span class="goal-h">${year} reading goal</span><span class="goal-count">${done} / ${goal}</span></div>
+    <div class="goal-sub">${sub}</div>
+    <div class="goal-bar"><i style="width:${pct}%"></i></div>
+  </div>`;
+}
+
 function renderStats(){
   renderStreak();
+  renderGoal();
   const total=books.length, read=books.filter(b=>b.status==='read').length, reading=books.filter(b=>b.status==='currently-reading').length,
     toread=books.filter(b=>b.status==='to-read').length, owned=books.filter(b=>b.owned).length, series=new Set(books.map(b=>b.series)).size, authors=new Set(books.map(b=>b.author)).size;
   document.getElementById('statGrid').innerHTML=[[read,'Books finished'],[reading,'Reading now'],[toread,'Want to read'],[owned,'On your shelves'],[series,'Series tracked'],[authors,'Authors loved']]
@@ -818,6 +1009,9 @@ function openPersonalize(){
     <div class="dlabel">Your name</div>
     <input id="p-name" value="${esc(profile.name||'')}" placeholder="Your name" style="width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;color:var(--ink);font-size:15px;font-family:inherit;font-weight:600;outline:none">
 
+    <div class="dlabel">${new Date().getFullYear()} reading goal (books)</div>
+    <input id="p-goal" type="number" min="0" step="1" value="${profile.yearlyGoal||''}" placeholder="e.g. 24" style="width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;color:var(--ink);font-size:15px;font-family:inherit;font-weight:600;outline:none">
+
     <div class="dlabel">How shelves look</div>
     <div class="look-row" id="lookRow">${looks.map(([k,l])=>`<div class="look ${(profile.shelfLook||'covers')===k?'on':''}" data-k="${k}"><div class="lk">${lookIcon[k]}</div>${l}</div>`).join('')}</div>
 
@@ -853,7 +1047,7 @@ function openPersonalize(){
   const rm=dp.querySelector('#p-photo-rm'); if(rm)rm.onclick=()=>{profile.banner=null; persistProfile(); openPersonalize();};
   dp.querySelectorAll('#quoteList .del').forEach(b=>b.onclick=()=>{profile.quotes.splice(+b.dataset.i,1); persistProfile(); openPersonalize();});
   dp.querySelector('#q-add').onclick=()=>{const t=dp.querySelector('#q-text').value.trim(); if(!t){toast('Type a line first');return;} const w=dp.querySelector('#q-who').value.trim(); (profile.quotes??=[]).push({text:t,who:w}); persistProfile(); openPersonalize();};
-  dp.querySelector('#p-save').onclick=()=>{profile.name=dp.querySelector('#p-name').value.trim(); persistProfile(); applyAccent(profile.accent); closeDrawer(); greet(); renderAll(); toast('Looking good!');};
+  dp.querySelector('#p-save').onclick=()=>{profile.name=dp.querySelector('#p-name').value.trim(); profile.yearlyGoal=Math.max(0,+dp.querySelector('#p-goal').value||0); persistProfile(); applyAccent(profile.accent); closeDrawer(); greet(); renderAll(); toast('Looking good!');};
   dp.querySelector('#bk-csv').onclick=exportCSV;
   dp.querySelector('#bk-json').onclick=exportJSON;
   dp.querySelector('#bk-import').onclick=()=>document.getElementById('dataInput').click();
@@ -972,6 +1166,8 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   if(v==='now')renderNow(); if(v==='stats')renderStats(); if(v==='discover')renderRecs(); if(v==='shelf'){renderBanner();renderHero();renderShelves();}
   window.scrollTo({top:0,behavior:'smooth'});});
 document.querySelectorAll('#groupSeg button').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('#groupSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); groupBy=btn.dataset.g; renderShelves();});
+document.querySelectorAll('#sortSeg button').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('#sortSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); sortBy=btn.dataset.s; renderShelves();});
+document.getElementById('ownedOnlyChip').onclick=function(){ ownedOnly=!ownedOnly; this.classList.toggle('on',ownedOnly); renderShelves(); };
 document.getElementById('search').oninput=e=>{query=e.target.value; renderShelves();};
 document.getElementById('addBtn').onclick=openAdd;
 document.getElementById('gearBtn').onclick=openPersonalize;
@@ -982,6 +1178,19 @@ document.getElementById('scrim').onclick=closeDrawer;
     icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" rx="110" fill="#e07a55"/><g fill="#fff6ea"><rect x="150" y="150" width="42" height="220" rx="6"/><rect x="205" y="150" width="42" height="220" rx="6"/><rect x="262" y="160" width="42" height="210" rx="6" transform="rotate(8 283 265)"/><rect x="140" y="360" width="240" height="26" rx="8"/></g></svg>'),sizes:"512x512",type:"image/svg+xml"}]};
   const blob=new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}); const l=document.createElement('link'); l.rel='manifest'; l.href=URL.createObjectURL(blob); document.head.appendChild(l);
 }catch(e){}})();
+
+// Offline support: registers sw.js (must be hosted alongside this file — see
+// bookshelf-project-context.md). Caches the app shell, fonts, and book
+// covers so the shelf still opens and shows covers with no signal.
+(function(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{ /* no sw.js next to this file yet, or unsupported host (e.g. local file://) */ });
+    });
+  }
+  window.addEventListener('offline', ()=> toast("You're offline — showing your saved shelf"));
+  window.addEventListener('online', ()=> toast('Back online'));
+})();
 
 init();
 </script>
