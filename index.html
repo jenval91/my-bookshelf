@@ -51,6 +51,13 @@
   .addbtn{background:var(--coral); color:#fff; font-size:26px; font-weight:700; box-shadow:0 8px 18px -8px var(--coral);}
   .gearbtn{background:var(--card); border:1.5px solid var(--line); color:var(--ink-soft); box-shadow:var(--shadow-sm);}
   .gearbtn svg{width:22px;height:22px;}
+  .organizebtn{background:var(--card); border:1.5px solid var(--line); color:var(--ink-soft); box-shadow:var(--shadow-sm); position:relative;}
+  .organizebtn svg{width:22px;height:22px;}
+  .organizebtn.active{color:var(--coral-dk); border-color:var(--coral);}
+  .organizebtn .dot{position:absolute; top:9px; right:10px; width:8px; height:8px; border-radius:50%; background:var(--coral); display:none;}
+  .organizebtn.active .dot{display:block;}
+  .org-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px;}
+  .org-row .seg{flex-wrap:wrap;}
 
   nav.tabs{position:fixed; bottom:0; left:0; right:0; z-index:30; background:rgba(255,250,242,.92);
     backdrop-filter:blur(16px) saturate(1.2); border-top:1.5px solid var(--line); display:flex; justify-content:center;
@@ -221,6 +228,16 @@
   .rec .ra{font-size:12.5px; color:var(--ink-soft); margin-top:3px; font-weight:600;}
   .rec .go{flex:0 0 auto; color:#fff; border:none; border-radius:13px; padding:11px 17px; font-size:13.5px; font-weight:800; font-family:inherit; cursor:pointer;}
   .rec .go:active{transform:scale(.95);}
+
+  .discover-card{background:var(--card2); border:1.5px solid var(--line); border-radius:var(--r); padding:15px 14px 16px; margin-top:8px; box-shadow:var(--shadow-sm);}
+  .disc-modes{display:flex; gap:6px; background:var(--card); border:1.5px solid var(--line); border-radius:15px; padding:4px; box-shadow:var(--shadow-sm);}
+  .disc-modes button{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; border-radius:11px; padding:9px 4px 8px; font-family:inherit; font-size:11px; font-weight:800; color:var(--ink-soft); cursor:pointer; transition:.15s;}
+  .disc-modes button svg{width:18px; height:18px;}
+  .disc-modes button.on{background:var(--honey); color:#583c12;}
+  .disc-modes button:active{transform:scale(.95);}
+  .disc-filters{display:flex; gap:9px; flex-wrap:wrap; margin-top:14px;}
+  .disc-filters .webselect{margin-top:0;}
+  .disc-results{margin-top:14px;}
 
   .webselect{flex:1 1 100px; margin-top:8px;}
   .webselect label{margin-bottom:5px; font-size:10.5px;}
@@ -402,6 +419,79 @@
     background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
   .goal-empty span{font-size:13.5px; color:var(--ink-soft); font-weight:700;}
   .goal-empty button{background:var(--coral); color:#fff; border:none; border-radius:12px; padding:9px 15px; font-size:13px; font-weight:800; font-family:inherit; cursor:pointer;}
+
+  /* ---------- Focus Mode ---------- */
+  .focusbtn{width:100%; background:linear-gradient(135deg,#2a2018,#1b140f); color:#f5ebe0; border:none; border-radius:16px; padding:14px; margin-top:14px;
+    font-family:inherit; font-size:14.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:var(--shadow-sm);}
+  .focusbtn svg{width:18px; height:18px;}
+  .focusbtn:active{transform:scale(.98);}
+  .focus-banner{background:linear-gradient(135deg,#fff1de,#ffe0c6); border:1.5px solid var(--line2); border-radius:16px; padding:15px 16px; margin-top:14px; box-shadow:var(--shadow-sm);}
+  .focus-banner .fb-h{font-family:'Fraunces',serif; font-weight:600; font-size:15.5px; margin-bottom:3px;}
+  .focus-banner .fb-s{font-size:12.5px; color:var(--ink-soft); font-weight:700; line-height:1.45; margin-bottom:11px;}
+  .focus-banner .fb-row{display:flex; gap:8px;}
+  .focus-banner .fb-row button{flex:1; border-radius:12px; padding:10px; font-family:inherit; font-size:12.5px; font-weight:800; cursor:pointer; border:none;}
+  .focus-banner .fb-try{background:var(--coral); color:#fff;}
+  .focus-banner .fb-not{background:var(--card); border:1.5px solid var(--line); color:var(--ink-soft);}
+
+  .focusOverlay{position:fixed; inset:0; z-index:200; background:#1b140f; display:flex; flex-direction:column;
+    opacity:0; pointer-events:none; transform:scale(1.02); transition:opacity .35s ease, transform .35s ease; color:#f5ebe0;}
+  .focusOverlay.on{opacity:1; pointer-events:auto; transform:scale(1);}
+  .fo-bg{position:absolute; inset:0; overflow:hidden; z-index:0;}
+  .fo-bg>div{position:absolute; inset:0; opacity:0; transition:opacity .6s;}
+  .focusOverlay[data-sound="rain"] .fo-bg-rain,
+  .focusOverlay[data-sound="fire"] .fo-bg-fire,
+  .focusOverlay[data-sound="beach"] .fo-bg-beach,
+  .focusOverlay[data-sound="forest"] .fo-bg-forest{opacity:1;}
+  .focusOverlay[data-sound="none"] .fo-bg{background:linear-gradient(180deg,#181310,#100c0a);}
+
+  .fo-bg-rain{background:linear-gradient(180deg,#141c26,#0d1319);}
+  .fo-streak{position:absolute; top:-20%; width:1.5px; height:14%; background:linear-gradient(180deg,rgba(180,210,255,0),rgba(180,210,255,.55)); animation:foRain 1s linear infinite;}
+  @keyframes foRain{ from{transform:translateY(-20%);} to{transform:translateY(130vh);} }
+
+  .fo-bg-fire{background:radial-gradient(ellipse at 50% 100%,#4a1c0c,#1c0f08 70%);}
+  .fo-flame{position:absolute; bottom:0; width:60px; height:90px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    background:radial-gradient(circle at 50% 70%,#ffcf6b,#e8792f 55%,transparent 75%); filter:blur(2px); animation:foFlicker 2.6s ease-in-out infinite;}
+  @keyframes foFlicker{ 0%,100%{transform:scaleY(1) scaleX(1) translateX(0); opacity:.9;} 30%{transform:scaleY(1.15) scaleX(.92) translateX(-4px); opacity:1;} 60%{transform:scaleY(.9) scaleX(1.08) translateX(5px); opacity:.85;} }
+
+  .fo-bg-beach{background:linear-gradient(180deg,#0f2733 0%,#123241 55%,#1a4657 100%);}
+  .fo-wave{position:absolute; left:-10%; width:120%; height:70px; border-radius:50%;
+    background:linear-gradient(180deg,rgba(180,225,235,.18),rgba(180,225,235,0)); animation:foWave 5.5s ease-in-out infinite;}
+  @keyframes foWave{ 0%,100%{transform:translateX(-3%) translateY(0);} 50%{transform:translateX(3%) translateY(-10px);} }
+
+  .fo-bg-forest{background:linear-gradient(180deg,#101c12,#0b140c);}
+  .fo-dapple{position:absolute; border-radius:50%; background:radial-gradient(circle,rgba(210,235,150,.22),transparent 70%); animation:foDapple 4.5s ease-in-out infinite;}
+  @keyframes foDapple{ 0%,100%{opacity:.25; transform:scale(1);} 50%{opacity:.6; transform:scale(1.25);} }
+
+  .fo-top{position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; padding:20px 20px 0;}
+  .fo-close{width:38px; height:38px; border-radius:12px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.18); color:#f5ebe0;
+    display:grid; place-items:center; cursor:pointer; font-size:20px; line-height:1; font-family:inherit;}
+  .fo-close:active{transform:scale(.92);}
+  .fo-book{font-size:13px; font-weight:800; color:rgba(245,235,224,.75); text-align:right; max-width:65%;}
+
+  .fo-mid{position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:0 22px;}
+  .fo-timerMode{display:flex; gap:6px; background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.16); border-radius:15px; padding:4px;}
+  .fo-timerMode button{background:none; border:none; border-radius:11px; padding:9px 16px; font-family:inherit; font-size:12.5px; font-weight:800; color:rgba(245,235,224,.7); cursor:pointer;}
+  .fo-timerMode button.on{background:var(--coral); color:#fff;}
+  .fo-durRow{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .fo-durRow.hide{display:none;}
+  .fo-durRow button{background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.16); color:rgba(245,235,224,.85); border-radius:12px;
+    padding:8px 14px; font-family:inherit; font-size:12.5px; font-weight:800; cursor:pointer;}
+  .fo-durRow button.on{background:var(--coral); border-color:var(--coral); color:#fff;}
+  .fo-time{font-family:'Fraunces',serif; font-weight:600; font-size:64px; letter-spacing:.02em; text-shadow:0 4px 20px rgba(0,0,0,.4);}
+  .fo-controls{display:flex; gap:12px;}
+  .fo-btn{border-radius:16px; padding:14px 26px; font-family:inherit; font-size:14.5px; font-weight:800; cursor:pointer; border:none;}
+  .fo-btn.main{background:var(--coral); color:#fff; box-shadow:0 10px 24px -8px rgba(224,122,85,.6); min-width:120px;}
+  .fo-btn.main:active{transform:scale(.96);}
+  .fo-btn.ghost{background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2); color:#f5ebe0;}
+  .fo-btn.ghost:active{transform:scale(.96);}
+
+  .fo-bottom{position:relative; z-index:1; padding:16px 20px 28px;}
+  .fo-soundlbl{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:rgba(245,235,224,.55); text-align:center; margin-bottom:10px;}
+  .fo-sounds{display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+  .fo-sounds button{display:flex; flex-direction:column; align-items:center; gap:4px; background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.16);
+    border-radius:14px; padding:10px 12px; color:rgba(245,235,224,.8); font-family:inherit; font-size:10.5px; font-weight:800; cursor:pointer;}
+  .fo-sounds button svg{width:19px; height:19px;}
+  .fo-sounds button.on{background:var(--coral); border-color:var(--coral); color:#fff;}
 </style>
 </head>
 <body>
@@ -410,6 +500,7 @@
   <div class="hello">
     <div class="hi" id="greet">Hi there</div>
     <div class="hbtns">
+      <button class="roundbtn organizebtn" id="organizeBtn" title="Organize your shelf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h11M4 12h7M4 17h4"/><circle cx="19" cy="7" r="2"/><circle cx="14" cy="17" r="2"/></svg></button>
       <button class="roundbtn gearbtn" id="gearBtn" title="Personalize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z"/></svg></button>
     </div>
   </div>
@@ -432,15 +523,6 @@
       <div class="apps-row" id="appsRow"></div>
     </div>
     <div class="chips" id="statusChips"></div>
-    <div class="arrange">
-      <span class="al">Arrange by</span>
-      <span class="seg" id="groupSeg"><button data-g="series" class="on">Collection</button><button data-g="author">Author</button><button data-g="status">Status</button></span>
-    </div>
-    <div class="arrange">
-      <span class="al">Sort</span>
-      <span class="seg" id="sortSeg"><button data-s="default" class="on">Default</button><button data-s="title">Title</button><button data-s="rating">Rating</button><button data-s="recent">Recently added</button></span>
-      <span class="chip" id="ownedOnlyChip" style="margin-left:auto;">Owned only</span>
-    </div>
     <div id="shelves"></div>
   </section>
 
@@ -467,25 +549,32 @@
     <div id="recs"></div>
 
     <div class="sec" style="margin-top:34px">Find something new</div><div class="sec-sub">Beyond your shelves — powered by Open Library.</div>
-    <div class="arrange">
-      <span class="seg" id="webModeSeg"><button data-m="foryou" class="on">For you</button><button data-m="trending">Trending</button><button data-m="search">Search</button></span>
+    <div class="discover-card">
+      <div class="disc-modes" id="webModeSeg">
+        <button data-m="foryou" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.3-9.3-8.5C1.2 8.6 2.5 5.8 5.4 5.8c1.9 0 3.1 1.1 3.7 2.1l1.4 1 1.4-1c.6-1 1.8-2.1 3.7-2.1 2.9 0 4.2 2.8 2.7 5.7C19 15.7 12 20 12 20Z"/></svg><span>For you</span></button>
+        <button data-m="trending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3-2 4-2 7a3 3 0 0 0 6 0c1.2 1 2 2.8 2 4.5A6.5 6.5 0 0 1 5 13.5C5 9 8 6.5 9 4c.3 1 .5 2 1 2.5C10.3 4.8 11 3 12 2Z"/></svg><span>Trending</span></button>
+        <button data-m="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span></button>
+      </div>
+
+      <div class="searchbar" id="webSearchRow" style="display:none">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="webQuery" placeholder="Title, author, or series…"></div>
+        <button class="roundbtn addbtn" id="webSearchGo">→</button>
+      </div>
+
+      <div class="disc-filters">
+        <div class="field webselect"><label>Genre</label><select id="webGenre">
+          <option value="">Any genre</option><option value="fantasy">Fantasy</option><option value="science_fiction">Sci-Fi</option>
+          <option value="romance">Romance</option><option value="mystery_and_detective_stories">Mystery</option>
+          <option value="historical_fiction">Historical fiction</option><option value="young_adult_fiction">YA</option>
+          <option value="horror">Horror</option><option value="nonfiction">Nonfiction</option></select></div>
+        <div class="field webselect"><label>Published</label><select id="webYear">
+          <option value="">Any time</option><option value="5">Last 5 years</option><option value="10">Last 10 years</option><option value="20">Last 20 years</option></select></div>
+        <div class="field webselect"><label>Sort</label><select id="webSort">
+          <option value="">Best match</option><option value="rating">Top rated</option><option value="new">Newest</option></select></div>
+      </div>
+
+      <div id="webRecs" class="disc-results"></div>
     </div>
-    <div class="searchbar" id="webSearchRow" style="display:none">
-      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="webQuery" placeholder="Title, author, or series…"></div>
-      <button class="roundbtn addbtn" id="webSearchGo">→</button>
-    </div>
-    <div class="arrange">
-      <div class="field webselect"><label>Genre</label><select id="webGenre">
-        <option value="">Any genre</option><option value="fantasy">Fantasy</option><option value="science_fiction">Sci-Fi</option>
-        <option value="romance">Romance</option><option value="mystery_and_detective_stories">Mystery</option>
-        <option value="historical_fiction">Historical fiction</option><option value="young_adult_fiction">YA</option>
-        <option value="horror">Horror</option><option value="nonfiction">Nonfiction</option></select></div>
-      <div class="field webselect"><label>Published</label><select id="webYear">
-        <option value="">Any time</option><option value="5">Last 5 years</option><option value="10">Last 10 years</option><option value="20">Last 20 years</option></select></div>
-      <div class="field webselect"><label>Sort</label><select id="webSort">
-        <option value="">Best match</option><option value="rating">Top rated</option><option value="new">Newest</option></select></div>
-    </div>
-    <div id="webRecs"></div>
   </section>
 </div>
 
@@ -501,6 +590,71 @@
 <div class="scrim" id="scrim"></div>
 <div class="drawer" id="drawer"><div class="grab"></div><div class="dpad" id="dpad"></div></div>
 <div class="toast" id="toast"></div>
+<div class="focusOverlay" id="focusOverlay" data-sound="rain">
+  <div class="fo-bg">
+    <div class="fo-bg-rain">
+      <div class="fo-streak" style="left:6%; animation-delay:0s; animation-duration:0.9s;"></div>
+      <div class="fo-streak" style="left:14%; animation-delay:.3s; animation-duration:1.1s;"></div>
+      <div class="fo-streak" style="left:23%; animation-delay:.15s; animation-duration:.8s;"></div>
+      <div class="fo-streak" style="left:33%; animation-delay:.5s; animation-duration:1.2s;"></div>
+      <div class="fo-streak" style="left:44%; animation-delay:.05s; animation-duration:.95s;"></div>
+      <div class="fo-streak" style="left:55%; animation-delay:.4s; animation-duration:1.05s;"></div>
+      <div class="fo-streak" style="left:66%; animation-delay:.2s; animation-duration:.85s;"></div>
+      <div class="fo-streak" style="left:76%; animation-delay:.6s; animation-duration:1.15s;"></div>
+      <div class="fo-streak" style="left:86%; animation-delay:.1s; animation-duration:1s;"></div>
+      <div class="fo-streak" style="left:94%; animation-delay:.35s; animation-duration:.9s;"></div>
+    </div>
+    <div class="fo-bg-fire">
+      <div class="fo-flame" style="left:calc(50% - 70px); animation-delay:0s;"></div>
+      <div class="fo-flame" style="left:calc(50% - 10px); width:46px; height:70px; animation-delay:.4s;"></div>
+      <div class="fo-flame" style="left:calc(50% + 40px); width:38px; height:58px; animation-delay:.8s;"></div>
+    </div>
+    <div class="fo-bg-beach">
+      <div class="fo-wave" style="bottom:8%; animation-delay:0s;"></div>
+      <div class="fo-wave" style="bottom:2%; animation-delay:1.2s; opacity:.7;"></div>
+      <div class="fo-wave" style="bottom:-4%; animation-delay:2.4s; opacity:.5;"></div>
+    </div>
+    <div class="fo-bg-forest">
+      <div class="fo-dapple" style="left:12%; top:18%; width:60px; height:60px; animation-delay:0s;"></div>
+      <div class="fo-dapple" style="left:70%; top:12%; width:80px; height:80px; animation-delay:1s;"></div>
+      <div class="fo-dapple" style="left:35%; top:55%; width:100px; height:100px; animation-delay:2s;"></div>
+      <div class="fo-dapple" style="left:80%; top:60%; width:50px; height:50px; animation-delay:1.6s;"></div>
+      <div class="fo-dapple" style="left:5%; top:70%; width:70px; height:70px; animation-delay:.6s;"></div>
+      <div class="fo-dapple" style="left:55%; top:30%; width:55px; height:55px; animation-delay:2.6s;"></div>
+    </div>
+  </div>
+  <div class="fo-top">
+    <button class="fo-close" id="focusClose" aria-label="Close focus mode">&times;</button>
+    <div class="fo-book" id="focusBookLabel"></div>
+  </div>
+  <div class="fo-mid">
+    <div class="fo-timerMode" id="focusModeSeg">
+      <button data-m="stopwatch" class="on">Stopwatch</button>
+      <button data-m="countdown">Countdown</button>
+    </div>
+    <div class="fo-durRow hide" id="focusDurRow">
+      <button data-d="15">15 min</button>
+      <button data-d="25" class="on">25 min</button>
+      <button data-d="45">45 min</button>
+      <button data-d="60">60 min</button>
+    </div>
+    <div class="fo-time" id="focusTimeDisplay">00:00</div>
+    <div class="fo-controls">
+      <button class="fo-btn ghost" id="focusResetBtn">Reset</button>
+      <button class="fo-btn main" id="focusStartBtn">Start</button>
+    </div>
+  </div>
+  <div class="fo-bottom">
+    <div class="fo-soundlbl">Ambient sound</div>
+    <div class="fo-sounds" id="focusSoundRow">
+      <button data-snd="rain" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 16a4 4 0 0 1 .3-8 5 5 0 0 1 9.7 1.5A3.5 3.5 0 0 1 17 16H7Z"/><path d="M8 19v1M12 19v2M16 19v1"/></svg><span>Rain</span></button>
+      <button data-snd="fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3-2 4-2 7a3 3 0 0 0 6 0c1.2 1 2 2.8 2 4.5A6.5 6.5 0 0 1 5 13.5C5 9 8 6.5 9 4c.3 1 .5 2 1 2.5C10.3 4.8 11 3 12 2Z"/></svg><span>Fire</span></button>
+      <button data-snd="beach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 16c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M2 20c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/></svg><span>Beach</span></button>
+      <button data-snd="forest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 7 10h2l-4 6h4v4h6v-4h4l-4-6h2Z"/></svg><span>Forest</span></button>
+      <button data-snd="none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M23 9l-6 6M17 9l6 6"/></svg><span>Silent</span></button>
+    </div>
+  </div>
+</div>
 <input type="file" id="imgInput" accept="image/*" style="display:none">
 <input type="file" id="dataInput" accept=".csv,.json,text/csv,application/json" style="display:none">
 
@@ -521,9 +675,11 @@ const store=(()=>{
 
 const ACCENTS={coral:['#e07a55','#c9603c'], berry:['#c25b7a','#a23f5e'], teal:['#4f9a93','#2f7a72'], amber:['#e0973a','#c2781f']};
 const DEFAULT_PROFILE={name:'Jennifer', shelfLook:'covers', accent:'coral', banner:null, yearlyGoal:0,
-  quotes:[{text:'A reader lives a thousand lives before he dies.', who:'George R.R. Martin'}]};
+  quotes:[{text:'A reader lives a thousand lives before he dies.', who:'George R.R. Martin'}], focusPromptSeen:false};
 
 let books=[], profile={...DEFAULT_PROFILE}, filterStatus='all', groupBy='series', sortBy='default', ownedOnly=false, query='', activeId=null;
+let focusBookId=null, focusMode='stopwatch', focusDurationMin=25, focusRemainingSec=25*60, focusElapsedSec=0, focusRunning=false, focusTickHandle=null, focusSound='rain';
+let audioCtx=null, focusAudioNodes=[], focusAudioTimers=[];
 let webMode='foryou', webGenre='', webYear='', webSort='', webQuery='', webResults=[], webBusy=false, webInited=false;
 
 async function init(){
@@ -571,23 +727,40 @@ function scoreDoc(doc,title,author){
   const dt=normTitle(doc.title), qt=normTitle(title);
   const da=(doc.author_name||[]).map(normAuthor), qa=normAuthor(author);
   let score=0;
-  if(dt===qt) score+=6; else if(dt.includes(qt)||qt.includes(dt)) score+=3;
-  if(da.some(a=>a===qa)) score+=6; else if(da.some(a=>a.includes(qa)||qa.includes(a))) score+=3;
+  if(dt===qt) score+=6;
+  else if(dt.includes(qt)||qt.includes(dt)) score+=3;
+  else { const dtW=new Set(dt.split(' ').filter(w=>w.length>2)), qtW=qt.split(' ').filter(w=>w.length>2);
+    const overlap=qtW.filter(w=>dtW.has(w)).length;
+    if(qtW.length&&overlap/qtW.length>=0.6) score+=2; }
+  if(da.some(a=>a===qa)) score+=6;
+  else if(da.some(a=>a.includes(qa)||qa.includes(a))) score+=3;
+  else if(qa){ const qaW=qa.split(' ').filter(w=>w.length>2);
+    if(da.some(a=>qaW.some(w=>a.includes(w)))) score+=2; }
   if(doc.cover_i) score+=2;
   if(doc.isbn&&doc.isbn.length) score+=1;
   return score;
 }
-async function lookupCover(book){
-  const q=`title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}`;
-  const url=`https://openlibrary.org/search.json?${q}&fields=key,title,author_name,cover_i,isbn,first_publish_year&limit=5`;
+async function searchOpenLibrary(params){
+  const url=`https://openlibrary.org/search.json?${params}&fields=key,title,author_name,cover_i,isbn,first_publish_year&limit=10`;
   const res=await fetch(url);
   if(!res.ok) throw new Error('search failed');
   const data=await res.json();
-  const docs=(data.docs||[]);
+  return data.docs||[];
+}
+async function lookupCover(book){
+  // Edition doesn't matter here — we just want *any* official cover attached,
+  // so we cast a wide net: precise field search first, then looser fallbacks
+  // for books where author-name formatting (initials, accents, "et al") would
+  // otherwise cause a real match to be missed.
+  let docs=await searchOpenLibrary(`title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}`);
+  if(!docs.length) docs=await searchOpenLibrary(`q=${encodeURIComponent(book.title+' '+book.author)}`);
+  if(!docs.length) docs=await searchOpenLibrary(`title=${encodeURIComponent(book.title)}`);
   if(!docs.length) return null;
-  let best=docs[0], bestScore=-1;
-  for(const d of docs){ const s=scoreDoc(d,book.title,book.author); if(s>bestScore){bestScore=s; best=d;} }
-  if(bestScore<3) return null; // too weak a match to trust
+  const withCover=docs.filter(d=>d.cover_i);
+  const pool=withCover.length?withCover:docs;
+  let best=pool[0], bestScore=-1;
+  for(const d of pool){ const s=scoreDoc(d,book.title,book.author); if(s>bestScore){bestScore=s; best=d;} }
+  if(bestScore<2) return null; // still needs to be recognizably the right book
   return best;
 }
 function verifyCoverExists(url){
@@ -1128,6 +1301,8 @@ function openDrawer(id){
     <div class="ownrow"><span class="ol">I own this book</span><div class="toggle ${b.owned?'on':''}" id="ownToggle"><i></i></div></div>
     <div class="dlabel">Open it in your apps</div>
     <div class="launch">${LAUNCH.map(l=>`<a class="lbtn" href="${l.url(b)}" target="_blank" rel="noopener"><div class="lg" style="background:${l.bg}">${l.t}</div><div class="ln">${l.n}</div></a>`).join('')}</div>
+    ${b.status==='currently-reading' && !profile.focusPromptSeen ? `<div class="focus-banner" id="focusBanner"><div class="fb-h">Try Focus Mode?</div><div class="fb-s">A quiet timer with ambient sound to help you settle into ${esc(b.title)}.</div><div class="fb-row"><button class="fb-try" id="fbTry">Try it</button><button class="fb-not" id="fbNot">Not now</button></div></div>` : ''}
+    ${b.status==='currently-reading' ? `<button class="focusbtn" id="focusEnterBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Enter Focus Mode</button>` : ''}
     <button class="removebtn" id="removeBtn">Remove from library</button>`;
   attachCovers(dp);
   function paintStars(){ const v=b.rating||0; dp.querySelectorAll('#starInput .star').forEach(st=>{const i=+st.dataset.i; const f=v>=i?100:(v>=i-0.5?50:0); st.querySelector('.fill').style.width=f+'%';});
@@ -1147,6 +1322,9 @@ function openDrawer(id){
       persist(); openDrawer(id); softRefresh();}; }
   dp.querySelector('#ownToggle').onclick=function(){b.owned=!b.owned; this.classList.toggle('on',b.owned); persist(); softRefresh();};
   dp.querySelector('#removeBtn').onclick=()=>{books=books.filter(x=>x.id!==id); persist(); closeDrawer(); renderAll(); toast('Removed from your library');};
+  const focusBtn=dp.querySelector('#focusEnterBtn'); if(focusBtn) focusBtn.onclick=()=>openFocusMode(id);
+  const fbTry=dp.querySelector('#fbTry'); if(fbTry) fbTry.onclick=()=>{ profile.focusPromptSeen=true; persistProfile(); openFocusMode(id); };
+  const fbNot=dp.querySelector('#fbNot'); if(fbNot) fbNot.onclick=()=>{ profile.focusPromptSeen=true; persistProfile(); openDrawer(id); };
   openSheet();
 }
 
@@ -1177,6 +1355,224 @@ function openAdd(){
   openSheet();
 }
 
+function focusFormat(sec){ sec=Math.max(0,Math.round(sec)); const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+
+function openFocusMode(id){
+  const b=books.find(x=>x.id===id); if(!b)return;
+  focusBookId=id; focusMode='stopwatch'; focusDurationMin=25; focusElapsedSec=0; focusRemainingSec=25*60; focusRunning=false;
+  const ov=document.getElementById('focusOverlay');
+  document.getElementById('focusBookLabel').textContent=b.title;
+  ov.querySelectorAll('#focusModeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.m==='stopwatch'));
+  document.getElementById('focusDurRow').classList.add('hide');
+  ov.querySelectorAll('#focusDurRow button').forEach(x=>x.classList.toggle('on',x.dataset.d==='25'));
+  document.getElementById('focusStartBtn').textContent='Start';
+  updateFocusDisplay();
+  closeDrawer();
+  ov.dataset.sound=focusSound;
+  ov.querySelectorAll('#focusSoundRow button').forEach(x=>x.classList.toggle('on',x.dataset.snd===focusSound));
+  ov.classList.add('on');
+}
+
+function closeFocusMode(){
+  focusPause();
+  stopFocusAudio();
+  document.getElementById('focusOverlay').classList.remove('on');
+  focusBookId=null;
+}
+
+function updateFocusDisplay(){
+  const disp=document.getElementById('focusTimeDisplay'); if(!disp)return;
+  disp.textContent = focusMode==='countdown' ? focusFormat(focusRemainingSec) : focusFormat(focusElapsedSec);
+}
+
+function focusTick(){
+  if(focusMode==='countdown'){
+    focusRemainingSec--;
+    if(focusRemainingSec<=0){ focusRemainingSec=0; updateFocusDisplay(); focusComplete(); return; }
+  } else { focusElapsedSec++; }
+  updateFocusDisplay();
+}
+
+function focusStart(){
+  if(focusRunning)return;
+  focusRunning=true;
+  document.getElementById('focusStartBtn').textContent='Pause';
+  startFocusAudio(focusSound);
+  focusTickHandle=setInterval(focusTick,1000);
+}
+function focusPause(){
+  focusRunning=false;
+  const btn=document.getElementById('focusStartBtn'); if(btn)btn.textContent='Start';
+  if(focusTickHandle){clearInterval(focusTickHandle); focusTickHandle=null;}
+  stopFocusAudio();
+}
+function focusResetTimer(){
+  focusPause();
+  focusElapsedSec=0; focusRemainingSec=focusDurationMin*60;
+  updateFocusDisplay();
+}
+function focusComplete(){
+  focusPause();
+  celebrate();
+  toast('Focus session complete — nice work!');
+}
+
+function ensureAudioCtx(){
+  if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx=null; } }
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function makeNoiseBuffer(ctx,color){
+  const len=ctx.sampleRate*4; const buf=ctx.createBuffer(1,len,ctx.sampleRate); const d=buf.getChannelData(0);
+  if(color==='brown'){ let last=0; for(let i=0;i<len;i++){ const white=Math.random()*2-1; last=(last+0.02*white)/1.02; d[i]=last*3.5; } }
+  else { for(let i=0;i<len;i++) d[i]=Math.random()*2-1; }
+  return buf;
+}
+
+function stopFocusAudio(){
+  focusAudioTimers.forEach(t=>clearTimeout(t)); focusAudioTimers=[];
+  focusAudioNodes.forEach(n=>{ try{ n.stop&&n.stop(); }catch(e){} try{ n.disconnect&&n.disconnect(); }catch(e){} });
+  focusAudioNodes=[];
+}
+
+function startFocusAudio(sound){
+  stopFocusAudio();
+  if(sound==='none')return;
+  const ctx=ensureAudioCtx(); if(!ctx)return;
+  const master=ctx.createGain(); master.gain.value=0.5; master.connect(ctx.destination); focusAudioNodes.push(master);
+
+  if(sound==='rain'){
+    const src=ctx.createBufferSource(); src.buffer=makeNoiseBuffer(ctx,'white'); src.loop=true;
+    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=900;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=6500;
+    const g=ctx.createGain(); g.gain.value=0.22;
+    src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(master); src.start();
+    focusAudioNodes.push(src,hp,lp,g);
+    scheduleDroplets(ctx,master);
+  } else if(sound==='fire'){
+    const src=ctx.createBufferSource(); src.buffer=makeNoiseBuffer(ctx,'brown'); src.loop=true;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1200;
+    const g=ctx.createGain(); g.gain.value=0.35;
+    src.connect(lp); lp.connect(g); g.connect(master); src.start();
+    focusAudioNodes.push(src,lp,g);
+    crackleModulate(ctx,g,master);
+  } else if(sound==='beach'){
+    const src=ctx.createBufferSource(); src.buffer=makeNoiseBuffer(ctx,'white'); src.loop=true;
+    const bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=500; bp.Q.value=0.5;
+    const g=ctx.createGain(); g.gain.value=0.28;
+    const lfo=ctx.createOscillator(); lfo.frequency.value=0.12;
+    const lfoGain=ctx.createGain(); lfoGain.gain.value=0.16;
+    lfo.connect(lfoGain); lfoGain.connect(g.gain);
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(); lfo.start();
+    focusAudioNodes.push(src,bp,g,lfo,lfoGain);
+  } else if(sound==='forest'){
+    const src=ctx.createBufferSource(); src.buffer=makeNoiseBuffer(ctx,'brown'); src.loop=true;
+    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=300;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+    const g=ctx.createGain(); g.gain.value=0.16;
+    src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(master); src.start();
+    focusAudioNodes.push(src,hp,lp,g);
+    scheduleChirps(ctx,master);
+  }
+}
+
+function scheduleDroplets(ctx,dest){
+  const fire=()=>{
+    if(!focusAudioNodes.length)return;
+    const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=1400+Math.random()*900;
+    const g=ctx.createGain(); g.gain.value=0;
+    o.connect(g); g.connect(dest);
+    const t=ctx.currentTime;
+    g.gain.linearRampToValueAtTime(0.05+Math.random()*0.05,t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+    o.start(t); o.stop(t+0.15);
+    const h=setTimeout(fire,90+Math.random()*260); focusAudioTimers.push(h);
+  };
+  const h=setTimeout(fire,200); focusAudioTimers.push(h);
+}
+
+function crackleModulate(ctx,gainNode,dest){
+  const fire=()=>{
+    if(!focusAudioNodes.length)return;
+    const t=ctx.currentTime;
+    gainNode.gain.setTargetAtTime(0.35+Math.random()*0.25,t,0.03);
+    gainNode.gain.setTargetAtTime(0.30,t+0.15,0.25);
+    if(Math.random()<0.3){
+      const o=ctx.createOscillator(); o.type='triangle'; o.frequency.value=1800+Math.random()*1400;
+      const og=ctx.createGain(); og.gain.value=0;
+      o.connect(og); og.connect(dest);
+      og.gain.linearRampToValueAtTime(0.04,t+0.003);
+      og.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+      o.start(t); o.stop(t+0.08);
+    }
+    const h=setTimeout(fire,180+Math.random()*420); focusAudioTimers.push(h);
+  };
+  const h=setTimeout(fire,150); focusAudioTimers.push(h);
+}
+
+function scheduleChirps(ctx,dest){
+  const fire=()=>{
+    if(!focusAudioNodes.length)return;
+    if(Math.random()<0.6){
+      const o=ctx.createOscillator(); o.type='sine'; const base=1800+Math.random()*1600;
+      o.frequency.setValueAtTime(base,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(base*1.3,ctx.currentTime+0.08);
+      const g=ctx.createGain(); g.gain.value=0;
+      o.connect(g); g.connect(dest);
+      const t=ctx.currentTime;
+      g.gain.linearRampToValueAtTime(0.03,t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+      o.start(t); o.stop(t+0.22);
+    }
+    const h=setTimeout(fire,1200+Math.random()*3500); focusAudioTimers.push(h);
+  };
+  const h=setTimeout(fire,800); focusAudioTimers.push(h);
+}
+
+function organizeIsCustom(){ return groupBy!=='series' || sortBy!=='default' || ownedOnly; }
+function updateOrganizeBtn(){ const b=document.getElementById('organizeBtn'); if(b) b.classList.toggle('active', organizeIsCustom()); }
+function openOrganize(){
+  const dp=document.getElementById('dpad');
+  const groupLbl={series:'Collection',author:'Author',status:'Status'};
+  const sortLbl={default:'Default',title:'Title',rating:'Rating',recent:'Recently added'};
+  dp.innerHTML=`<h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:6px 0 3px">Organize your shelf</h2>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin:0;font-weight:600">Group, sort, and filter how your books show up on Shelves.</p>
+
+    <div class="dlabel">Arrange by</div>
+    <span class="seg" id="orgGroupSeg" style="width:100%">
+      <button data-g="series" class="${groupBy==='series'?'on':''}" style="flex:1">Collection</button>
+      <button data-g="author" class="${groupBy==='author'?'on':''}" style="flex:1">Author</button>
+      <button data-g="status" class="${groupBy==='status'?'on':''}" style="flex:1">Status</button>
+    </span>
+
+    <div class="dlabel">Sort</div>
+    <span class="seg" id="orgSortSeg" style="width:100%; flex-wrap:wrap;">
+      <button data-s="default" class="${sortBy==='default'?'on':''}" style="flex:1">Default</button>
+      <button data-s="title" class="${sortBy==='title'?'on':''}" style="flex:1">Title</button>
+      <button data-s="rating" class="${sortBy==='rating'?'on':''}" style="flex:1">Rating</button>
+      <button data-s="recent" class="${sortBy==='recent'?'on':''}" style="flex:1">Recent</button>
+    </span>
+
+    <div class="dlabel">Filter</div>
+    <div class="org-row"><span class="chip ${ownedOnly?'on':''}" id="orgOwnedOnlyChip">Owned only</span></div>
+
+    <div class="note" id="orgSummary">Showing by <b>${groupLbl[groupBy]}</b>, sorted <b>${sortLbl[sortBy]}</b>${ownedOnly?', owned only':''}.</div>
+
+    <button class="ghostbtn" id="orgReset">Reset to default</button>
+    <button class="savebtn" id="orgDone">Done</button>`;
+
+  const refreshSummary=()=>{ const el=dp.querySelector('#orgSummary'); if(el) el.innerHTML=`Showing by <b>${groupLbl[groupBy]}</b>, sorted <b>${sortLbl[sortBy]}</b>${ownedOnly?', owned only':''}.`; };
+
+  dp.querySelectorAll('#orgGroupSeg button').forEach(btn=>btn.onclick=()=>{dp.querySelectorAll('#orgGroupSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); groupBy=btn.dataset.g; renderShelves(); updateOrganizeBtn(); refreshSummary();});
+  dp.querySelectorAll('#orgSortSeg button').forEach(btn=>btn.onclick=()=>{dp.querySelectorAll('#orgSortSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); sortBy=btn.dataset.s; renderShelves(); updateOrganizeBtn(); refreshSummary();});
+  dp.querySelector('#orgOwnedOnlyChip').onclick=function(){ ownedOnly=!ownedOnly; this.classList.toggle('on',ownedOnly); renderShelves(); updateOrganizeBtn(); refreshSummary(); };
+  dp.querySelector('#orgReset').onclick=()=>{ groupBy='series'; sortBy='default'; ownedOnly=false; renderShelves(); updateOrganizeBtn(); openOrganize(); };
+  dp.querySelector('#orgDone').onclick=closeDrawer;
+
+  updateOrganizeBtn();
+  openSheet();
+}
 function openPersonalize(){
   const dp=document.getElementById('dpad');
   const looks=[['covers','Covers'],['noir','Black & white'],['spines','Spines']];
@@ -1352,9 +1748,6 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   if(v==='now')renderNow(); if(v==='stats')renderStats(); if(v==='shelf'){renderBanner();renderHero();renderShelves();}
   if(v==='discover'){ renderRecs(); if(!webInited){webInited=true; runWebFetch();} }
   window.scrollTo({top:0,behavior:'smooth'});});
-document.querySelectorAll('#groupSeg button').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('#groupSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); groupBy=btn.dataset.g; renderShelves();});
-document.querySelectorAll('#sortSeg button').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('#sortSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); sortBy=btn.dataset.s; renderShelves();});
-document.getElementById('ownedOnlyChip').onclick=function(){ ownedOnly=!ownedOnly; this.classList.toggle('on',ownedOnly); renderShelves(); };
 document.getElementById('search').oninput=e=>{query=e.target.value; renderShelves();};
 document.querySelectorAll('#webModeSeg button').forEach(btn=>btn.onclick=()=>{
   document.querySelectorAll('#webModeSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
@@ -1367,7 +1760,29 @@ document.getElementById('webSearchGo').onclick=()=>{webQuery=document.getElement
 document.getElementById('webQuery').addEventListener('keydown',e=>{if(e.key==='Enter'){webQuery=e.target.value; runWebFetch();}});
 document.getElementById('addBtn').onclick=openAdd;
 document.getElementById('gearBtn').onclick=openPersonalize;
+document.getElementById('organizeBtn').onclick=openOrganize;
 document.getElementById('scrim').onclick=closeDrawer;
+document.querySelectorAll('#focusModeSeg button').forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll('#focusModeSeg button').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  focusMode=btn.dataset.m;
+  document.getElementById('focusDurRow').classList.toggle('hide', focusMode!=='countdown');
+  focusPause();
+  focusElapsedSec=0; focusRemainingSec=focusDurationMin*60;
+  updateFocusDisplay();
+});
+document.querySelectorAll('#focusDurRow button').forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll('#focusDurRow button').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  focusDurationMin=+btn.dataset.d; focusPause(); focusRemainingSec=focusDurationMin*60; updateFocusDisplay();
+});
+document.querySelectorAll('#focusSoundRow button').forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll('#focusSoundRow button').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  focusSound=btn.dataset.snd; document.getElementById('focusOverlay').dataset.sound=focusSound;
+  if(focusRunning){ stopFocusAudio(); startFocusAudio(focusSound); }
+});
+document.getElementById('focusStartBtn').onclick=()=>{ focusRunning?focusPause():focusStart(); };
+document.getElementById('focusResetBtn').onclick=focusResetTimer;
+document.getElementById('focusClose').onclick=closeFocusMode;
+updateOrganizeBtn();
 
 (function(){try{
   const mf={name:"My Bookshelf",short_name:"Bookshelf",display:"standalone",background_color:"#fff6ea",theme_color:"#fbeede",start_url:".",

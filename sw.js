@@ -1,7 +1,7 @@
 // My Bookshelf — offline service worker
 // Bump CACHE_VERSION any time you edit my-bookshelf.html so returning
 // users get the fresh copy instead of a stale cached one.
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const SHELL_CACHE  = `bookshelf-shell-${CACHE_VERSION}`;
 const COVER_CACHE  = 'bookshelf-covers-v1';   // covers rarely change once fetched, keep across shell versions
 const FONT_CACHE   = 'bookshelf-fonts-v1';    // same for fonts
